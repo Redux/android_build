@@ -122,6 +122,7 @@ GRANDFATHERED_USER_MODULES += \
 	fw_bcm4329_apsta.bin \
 	fw_bcm4329.bin \
 	genext2fs \
+	gps.bravo \
 	gps.mahimahi \
 	gralloc.default \
 	gralloc.qsd8k \
@@ -132,6 +133,9 @@ GRANDFATHERED_USER_MODULES += \
 	gzip \
 	hciattach \
 	hierarchyviewer \
+	hierarchyviewer1 \
+	hierarchyviewer2 \
+	hierarchyviewerlib \
 	hist_trace \
 	hosttestlib \
 	icudata \
@@ -151,6 +155,7 @@ GRANDFATHERED_USER_MODULES += \
 	jdwpspy \
 	jfreechart-1.0.9 \
 	jfreechart-1.0.9-swt \
+	jsilver \
 	jsr305 \
 	jsr305lib \
 	junit \
@@ -199,6 +204,7 @@ GRANDFATHERED_USER_MODULES += \
 	libdb \
 	libdbus \
 	libdiskconfig \
+	libdiskconfig_host \
 	libdl \
 	libdrm1 \
 	libdrm1_jni \
@@ -378,6 +384,7 @@ GRANDFATHERED_USER_MODULES += \
 	mkyaffs2image \
 	monkey \
 	monkeyrunner \
+	MonkeryRunnerTest \
 	mtpd \
 	ndc \
 	netcfg \
