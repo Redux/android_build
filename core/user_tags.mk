@@ -384,7 +384,7 @@ GRANDFATHERED_USER_MODULES += \
 	mkyaffs2image \
 	monkey \
 	monkeyrunner \
-	MonkeryRunnerTest \
+	MonkeyRunnerTest \
 	mtpd \
 	ndc \
 	netcfg \
