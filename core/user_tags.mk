@@ -62,6 +62,7 @@ GRANDFATHERED_USER_MODULES += \
 	bootanimation \
 	brcm_patchram_plus \
 	bugreport \
+	busybox \
 	cfassembler \
 	check_stack \
 	check_trace \
@@ -79,8 +80,6 @@ GRANDFATHERED_USER_MODULES += \
 	dasm \
 	dbus-daemon \
 	ddmlib \
-	ddmlibTests \
-	ddmlib-prebuilt \
 	ddms \
 	ddmuilib \
 	debuggerd \
@@ -133,9 +132,6 @@ GRANDFATHERED_USER_MODULES += \
 	gzip \
 	hciattach \
 	hierarchyviewer \
-	hierarchyviewer1 \
-	hierarchyviewer2 \
-	hierarchyviewerlib \
 	hist_trace \
 	hosttestlib \
 	icudata \
@@ -155,7 +151,6 @@ GRANDFATHERED_USER_MODULES += \
 	jdwpspy \
 	jfreechart-1.0.9 \
 	jfreechart-1.0.9-swt \
-	jsilver \
 	jsr305 \
 	jsr305lib \
 	junit \
@@ -190,6 +185,7 @@ GRANDFATHERED_USER_MODULES += \
 	libbluetoothd \
 	libbuiltinplugin \
 	libbundlewrapper \
+	libbusybox \
 	libbz \
 	libc \
 	libcamera_client \
@@ -199,10 +195,10 @@ GRANDFATHERED_USER_MODULES += \
 	libc_nomalloc \
 	libctest \
 	libcutils \
+	libclearsilverregex \
 	libdb \
 	libdbus \
 	libdiskconfig \
-	libdiskconfig_host \
 	libdl \
 	libdrm1 \
 	libdrm1_jni \
@@ -382,7 +378,6 @@ GRANDFATHERED_USER_MODULES += \
 	mkyaffs2image \
 	monkey \
 	monkeyrunner \
-	MonkeyRunnerTest \
 	mtpd \
 	ndc \
 	netcfg \
@@ -409,7 +404,6 @@ GRANDFATHERED_USER_MODULES += \
 	profile_trace \
 	q2dm \
 	q2g \
-	qemu-android \
 	qwerty2.kcm \
 	qwerty.kcm \
 	racoon \
@@ -452,6 +446,7 @@ GRANDFATHERED_USER_MODULES += \
 	sqlite3 \
 	stack_dump \
 	stringtemplate \
+	su \
 	surfaceflinger \
 	svc \
 	swing-worker-1.1 \

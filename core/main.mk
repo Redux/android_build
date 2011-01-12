@@ -31,11 +31,11 @@ endif
 #endif
 
 # check for broken versions of make
-ifeq (0,$(shell expr $$(echo $(MAKE_VERSION) | sed "s/[^0-9\.].*//") = 3.81))
+ifeq (0,$(shell expr $$(echo $(MAKE_VERSION) | sed "s/[^0-9\.].*//") \>= 3.81))
 $(warning ********************************************************************************)
 $(warning *  You are using version $(MAKE_VERSION) of make.)
-$(warning *  Android can only be built by version 3.81.)
-$(warning *  see http://source.android.com/source/download.html)
+$(warning *  You must upgrade to version 3.81 or greater.)
+$(warning *  see http://source.android.com/download)
 $(warning ********************************************************************************)
 $(error stopping)
 endif
@@ -77,7 +77,7 @@ $(warning ************************************************************)
 $(warning You are attempting to build on a 32-bit system.)
 $(warning Only 64-bit build environments are supported beyond froyo/2.2.)
 $(warning ************************************************************)
-$(error stop)
+BUILDING_ON_32BIT := true
 endif
 endif
 
@@ -124,7 +124,7 @@ $(info Your version is: $(shell java -version 2>&1 | head -n 1).)
 $(info The correct version is: 1.6.)
 $(info $(space))
 $(info Please follow the machine setup instructions at)
-$(info $(space)$(space)$(space)$(space)http://source.android.com/source/download.html)
+$(info $(space)$(space)$(space)$(space)http://source.android.com/download)
 $(info ************************************************************)
 $(error stop)
 endif
@@ -140,19 +140,21 @@ $(info Your version is: $(shell javac -version 2>&1 | head -n 1).)
 $(info The correct version is: 1.6.)
 $(info $(space))
 $(info Please follow the machine setup instructions at)
-$(info $(space)$(space)$(space)$(space)http://source.android.com/source/download.html)
+$(info $(space)$(space)$(space)$(space)http://source.android.com/download)
 $(info ************************************************************)
 $(error stop)
 endif
 
 $(shell echo 'VERSIONS_CHECKED := $(VERSION_CHECK_SEQUENCE_NUMBER)' \
         > $(OUT_DIR)/versions_checked.mk)
+$(shell echo 'BUILDING_ON_32BIT := $(BUILDING_ON_32BIT)' \
+        >> $(OUT_DIR)/versions_checked.mk)
 endif
 
 # These are the modifier targets that don't do anything themselves, but
 # change the behavior of the build.
 # (must be defined before including definitions.make)
-INTERNAL_MODIFIER_TARGETS := showcommands checkbuild all
+INTERNAL_MODIFIER_TARGETS := showcommands checkbuild
 
 # Bring in standard build system definitions.
 include $(BUILD_SYSTEM)/definitions.mk
@@ -207,7 +209,7 @@ user_variant := $(filter userdebug user,$(TARGET_BUILD_VARIANT))
 enable_target_debugging := true
 ifneq (,$(user_variant))
   # Target is secure in user builds.
-  ADDITIONAL_DEFAULT_PROPERTIES += ro.secure=1
+  ADDITIONAL_DEFAULT_PROPERTIES += ro.secure=0
 
   tags_to_install := user
   ifeq ($(user_variant),userdebug)
@@ -231,7 +233,7 @@ ifneq (,$(user_variant))
   endif
 
   # Disallow mock locations by default for user builds
-  ADDITIONAL_DEFAULT_PROPERTIES += ro.allow.mock.location=0
+  ADDITIONAL_DEFAULT_PROPERTIES += ro.allow.mock.location=1
 
 else # !user_variant
   # Turn on checkjni for non-user builds.
@@ -391,18 +393,17 @@ subdirs := \
 	dalvik/libdex \
 	dalvik/tools/dmtracedump \
 	dalvik/tools/hprof-conv \
-	development/host \
-	development/tools/etc1tool \
 	development/tools/line_endings \
-	external/easymock \
+	development/tools/etc1tool \
+	sdk/emulator/mksdcard \
+	sdk/sdklauncher \
+	development/host \
 	external/expat \
 	external/libpng \
 	external/qemu \
 	external/sqlite/dist \
 	external/zlib \
 	frameworks/base \
-	sdk/emulator/mksdcard \
-	sdk/sdklauncher \
 	system/core/adb \
 	system/core/fastboot \
 	system/core/libcutils \
@@ -419,15 +420,13 @@ subdirs += \
 	sdk/archquery \
 	sdk/androidprefs \
 	sdk/apkbuilder \
-	sdk/ddms \
-	sdk/hierarchyviewer2 \
-	sdk/ide_common \
 	sdk/jarutils \
 	sdk/layoutlib_api \
-	sdk/layoutopt \
+	sdk/layoutlib_utils \
 	sdk/ninepatch \
 	sdk/sdkstats \
 	sdk/sdkmanager \
+	sdk/layoutopt \
 	development/apps \
 	development/tools/mkstubs \
 	packages
@@ -580,7 +579,7 @@ else
 endif
 # Use tags to get the non-APPS user modules.  Use the product
 # definition files to get the APPS user modules.
-user_MODULES := $(sort $(call get-tagged-modules,user shell_$(TARGET_SHELL)))
+user_MODULES := $(sort $(call get-tagged-modules,user))
 user_MODULES := $(user_MODULES) $(user_PACKAGES)
 
 eng_MODULES := $(sort $(call get-tagged-modules,eng))
@@ -679,9 +678,6 @@ ramdisk: $(INSTALLED_RAMDISK_TARGET)
 .PHONY: systemtarball
 systemtarball: $(INSTALLED_SYSTEMTARBALL_TARGET)
 
-.PHONY: boottarball
-boottarball: $(INSTALLED_BOOTTARBALL_TARGET)
-
 .PHONY: userdataimage
 userdataimage: $(INSTALLED_USERDATAIMAGE_TARGET)
 
@@ -775,12 +771,20 @@ $(call dist-for-goals,sdk, \
 findbugs: $(INTERNAL_FINDBUGS_HTML_TARGET) $(INTERNAL_FINDBUGS_XML_TARGET)
 
 .PHONY: clean
+dirs_to_clean := \
+	$(PRODUCT_OUT) \
+	$(TARGET_COMMON_OUT_ROOT)
 clean:
-	@rm -rf $(OUT_DIR)
-	@echo "Entire build directory removed."
+	@for dir in $(dirs_to_clean) ; do \
+	    echo "Cleaning $$dir..."; \
+	    rm -rf $$dir; \
+	done
+	@echo "Clean."; \
 
 .PHONY: clobber
-clobber: clean
+clobber:
+	@rm -rf $(OUT_DIR)
+	@echo "Entire build directory removed."
 
 # The rules for dataclean and installclean are defined in cleanbuild.mk.
 

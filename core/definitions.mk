@@ -1086,10 +1086,13 @@ endef
 ## Commands for filtering a target executable or library
 ###########################################################
 
+# Because of bug 743462 ("Prelinked image magic gets stripped
+# by arm-elf-objcopy"), we have to use soslim to strip target
+# binaries.
 define transform-to-stripped
 @mkdir -p $(dir $@)
 @echo "target Strip: $(PRIVATE_MODULE) ($@)"
-$(hide) $(TARGET_STRIP_COMMAND)
+$(hide) $(SOSLIM) --strip --shady --quiet $< --outfile $@
 endef
 
 define transform-to-prelinked
@@ -1228,7 +1231,7 @@ endef
 ifeq ($(HOST_OS),windows)
 xlint_unchecked :=
 else
-xlint_unchecked := -Xlint:unchecked
+#xlint_unchecked := -Xlint:unchecked
 endif
 
 # emit-line, <word list>, <output file>
@@ -1298,8 +1301,7 @@ $(hide) tr ' ' '\n' < $(dir $(PRIVATE_CLASS_INTERMEDIATES_DIR))/java-source-list
 $(hide) $(TARGET_JAVAC) -encoding ascii $(PRIVATE_BOOTCLASSPATH) \
     $(addprefix -classpath ,$(strip \
         $(call normalize-path-list,$(PRIVATE_ALL_JAVA_LIBRARIES)))) \
-    $(PRIVATE_JAVACFLAGS) $(strip $(PRIVATE_JAVAC_DEBUG_FLAGS)) \
-	$(if $(findstring true,$(LOCAL_WARNINGS_ENABLE)),$(xlint_unchecked),) \
+    $(PRIVATE_JAVACFLAGS) $(strip $(PRIVATE_JAVAC_DEBUG_FLAGS)) $(xlint_unchecked) \
     -extdirs "" -d $(PRIVATE_CLASS_INTERMEDIATES_DIR) \
     \@$(dir $(PRIVATE_CLASS_INTERMEDIATES_DIR))/java-source-list-uniq \
     || ( rm -rf $(PRIVATE_CLASS_INTERMEDIATES_DIR) ; exit 41 )
@@ -1654,11 +1656,10 @@ endif
 
 # Convert a partition data size (eg, as reported in /proc/mtd) to the
 # size of the image used to flash that partition (which includes a
-# spare area for each page).
+# 64-byte spare area for each 2048-byte page).
 # $(1): the partition data size
 define image-size-from-data-size
-$(shell echo $$(($(1) / $(BOARD_NAND_PAGE_SIZE) * \
-  ($(BOARD_NAND_PAGE_SIZE)+$(BOARD_NAND_SPARE_SIZE)))))
+$(shell echo $$(($(1) / 2048 * (2048+64))))
 endef
 
 # $(1): The file(s) to check (often $@)

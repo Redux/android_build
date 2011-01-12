@@ -16,45 +16,40 @@
 
 PRODUCT_PROPERTY_OVERRIDES :=
 
-PRODUCT_PACKAGES := \
-	SystemUI \
-	AccountAndSyncSettings \
-	Camera \
-	Calculator \
-	DeskClock \
-	Development \
-	DrmProvider \
-	Email \
-	Fallback \
-	Gallery \
-	GPSEnable \
-	Launcher2 \
-	Protips \
-	Music \
-	Mms \
-	Settings \
-	SdkSetup \
-	CustomLocale \
-	gpstest \
-	sqlite3 \
-	LatinIME \
-	PinyinIME \
-	OpenWnn \
-	libWnnEngDic \
-	libWnnJpnDic \
-	libwnndict \
-	CertInstaller \
-	LiveWallpapersPicker \
-	ApiDemos \
-	GestureBuilder \
-	SoftKeyboard \
-	CubeLiveWallpapers \
-	QuickSearchBox \
-        monkeyrunner \
-        guavalib \
-        jsr305lib \
-	jython \
-        jsilver
+#PRODUCT_PACKAGES := \
+#	SystemUI \
+#	AccountAndSyncSettings \
+#	Camera \
+#	Calculator \
+#	DeskClock \
+#	Development \
+#	DrmProvider \
+#	Email \
+#	Fallback \
+#	Gallery \
+#	GPSEnable \
+#	Launcher2 \
+#	Protips \
+#	Music \
+#	Mms \
+#	Settings \
+#	SdkSetup \
+#	CustomLocale \
+#	gpstest \
+#	sqlite3 \
+#	LatinIME \
+#	PinyinIME \
+#	OpenWnn \
+#	libWnnEngDic \
+#	libWnnJpnDic \
+#	libwnndict \
+#	CertInstaller \
+#	LiveWallpapersPicker \
+#	ApiDemos \
+#	GestureBuilder \
+#	SoftKeyboard \
+#	CubeLiveWallpapers \
+#	QuickSearchBox
 
 # Host tools that are parts of the SDK.
 # See development/build/sdk.atree
@@ -71,8 +66,7 @@ PRODUCT_PACKAGES += \
 	layoutopt \
 	traceview \
 	android \
-	dexdump \
-        monkeyrunner
+	dexdump
 
 # Native host Java libraries that are parts of the SDK.
 # See development/build/sdk.atree
@@ -105,11 +99,7 @@ PRODUCT_PACKAGES += \
 	org.eclipse.equinox.common_3.4.0.v20080421-2006 \
 	org.eclipse.jface_3.4.2.M20090107-0800 \
 	osgi \
-	layoutlib \
-        monkeyrunner \
-        guavalib \
-        jsr305lib \
-	jython
+	layoutlib
 
 PRODUCT_PACKAGE_OVERLAYS := development/sdk_overlay
 

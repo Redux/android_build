@@ -48,12 +48,6 @@ ifeq ($(strip $(LOCAL_NO_FDO_SUPPORT)),)
 endif
 
 ###########################################################
-## Explicitly declare assembly-only __ASSEMBLY__ macro for
-## assembly source
-###########################################################
-LOCAL_ASFLAGS += -D__ASSEMBLY__
-
-###########################################################
 ## Define PRIVATE_ variables from global vars
 ###########################################################
 ifdef LOCAL_NDK_VERSION
@@ -108,7 +102,6 @@ endif
 ## Define arm-vs-thumb-mode flags.
 ###########################################################
 LOCAL_ARM_MODE := $(strip $(LOCAL_ARM_MODE))
-ifeq ($(TARGET_ARCH),arm)
 arm_objects_mode := $(if $(LOCAL_ARM_MODE),$(LOCAL_ARM_MODE),arm)
 normal_objects_mode := $(if $(LOCAL_ARM_MODE),$(LOCAL_ARM_MODE),thumb)
 
@@ -117,12 +110,6 @@ normal_objects_mode := $(if $(LOCAL_ARM_MODE),$(LOCAL_ARM_MODE),thumb)
 # actually used (although they are usually empty).
 arm_objects_cflags := $($(my_prefix)$(arm_objects_mode)_CFLAGS)
 normal_objects_cflags := $($(my_prefix)$(normal_objects_mode)_CFLAGS)
-else
-arm_objects_mode :=
-normal_objects_mode :=
-arm_objects_cflags :=
-normal_objects_cflags :=
-endif
 
 ###########################################################
 ## Define per-module debugging flags.  Users can turn on

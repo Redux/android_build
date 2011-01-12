@@ -19,8 +19,9 @@ PRODUCT_DEVICE := generic
 PRODUCT_NAME := core
 
 PRODUCT_PROPERTY_OVERRIDES := \
-    ro.config.notification_sound=OnTheHunt.ogg \
-    ro.config.alarm_alert=Alarm_Classic.ogg
+    ro.config.notification_sound=Cloud.ogg \
+    ro.config.alarm_alert=Light.ogg \
+    ro.config.ringtone=Enter_the_Nexus.ogg
 
 PRODUCT_PACKAGES := \
     bouncycastle \
@@ -41,7 +42,6 @@ PRODUCT_PACKAGES := \
     framework-res \
     hprof-conv \
     icu.dat \
-    ip-up-vpn \
     jasmin \
     jasmin.jar \
     libcrypto \
@@ -52,14 +52,12 @@ PRODUCT_PACKAGES := \
     libicuuc \
     libjavacore \
     libnativehelper \
-    libnfc_ndef \
     libsqlite_jni \
     libssl \
     libz \
     sqlite-jdbc \
     Browser \
     Contacts \
-    Home \
     HTMLViewer \
     Phone \
     ApplicationsProvider \

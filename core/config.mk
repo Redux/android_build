@@ -106,9 +106,6 @@ TARGET_COMPRESS_MODULE_SYMBOLS := false
 # Default is to prelink modules.
 TARGET_PRELINK_MODULE := true
 
-# Default shell is ash. Other possible value is mksh.
-TARGET_SHELL := ash
-
 # ###############################################################
 # Include sub-configuration files
 # ###############################################################
@@ -210,7 +207,7 @@ APICHECK := $(HOST_OUT_EXECUTABLES)/apicheck$(HOST_EXECUTABLE_SUFFIX)
 FS_GET_STATS := $(HOST_OUT_EXECUTABLES)/fs_get_stats$(HOST_EXECUTABLE_SUFFIX)
 MKEXT2IMG := $(HOST_OUT_EXECUTABLES)/genext2fs$(HOST_EXECUTABLE_SUFFIX)
 MAKE_EXT4FS := $(HOST_OUT_EXECUTABLES)/make_ext4fs$(HOST_EXECUTABLE_SUFFIX)
-MKEXTUSERIMG := $(HOST_OUT_EXECUTABLES)/mkuserimg.sh
+MKEXT2USERIMG := $(HOST_OUT_EXECUTABLES)/mkuserimg.sh
 MKEXT2BOOTIMG := external/genext2fs/mkbootimg_ext2.sh
 MKTARBALL := build/tools/mktarball.sh
 TUNE2FS := tune2fs
@@ -235,6 +232,7 @@ EMMA_JAR := external/emma/lib/emma$(COMMON_JAVA_PACKAGE_SUFFIX)
 # Binary prelinker/compressor tools
 APRIORI := $(HOST_OUT_EXECUTABLES)/apriori$(HOST_EXECUTABLE_SUFFIX)
 LSD := $(HOST_OUT_EXECUTABLES)/lsd$(HOST_EXECUTABLE_SUFFIX)
+SOSLIM := $(HOST_OUT_EXECUTABLES)/soslim$(HOST_EXECUTABLE_SUFFIX)
 
 # Deal with archaic version of bison on Mac OS X.
 ifeq ($(filter 1.28,$(shell $(YACC) -V)),)
@@ -311,8 +309,8 @@ endif
 HOST_GLOBAL_CFLAGS += $(HOST_RELEASE_CFLAGS)
 HOST_GLOBAL_CPPFLAGS += $(HOST_RELEASE_CPPFLAGS)
 
-TARGET_GLOBAL_CFLAGS += $(TARGET_RELEASE_CFLAGS)
-TARGET_GLOBAL_CPPFLAGS += $(TARGET_RELEASE_CPPFLAGS)
+TARGET_GLOBAL_CFLAGS += $(TARGET_RELEASE_CFLAGS) $(BOARD_GLOBAL_CFLAGS)
+TARGET_GLOBAL_CPPFLAGS += $(TARGET_RELEASE_CPPFLAGS) $(BOARD_GLOBAL_CFLAGS)
 
 PREBUILT_IS_PRESENT := $(if $(wildcard prebuilt/Android.mk),true)
 
@@ -349,13 +347,3 @@ TARGET_AVAILABLE_NDK_VERSIONS := $(call numerically_sort,\
     $(wildcard $(HISTORICAL_NDK_VERSIONS_ROOT)/android-ndk-r*)))
 
 INTERNAL_PLATFORM_API_FILE := $(TARGET_OUT_COMMON_INTERMEDIATES)/PACKAGING/public_api.xml
-
-# This is the standard way to name a directory containing prebuilt target
-# objects. E.g., prebuilt/$(TARGET_PREBUILT_TAG)/libc.so
-ifeq ($(TARGET_SIMULATOR),true)
-  TARGET_PREBUILT_TAG := $(TARGET_OS)-$(TARGET_ARCH)
-else
-  TARGET_PREBUILT_TAG := android-$(TARGET_ARCH)
-endif
-
-include $(BUILD_SYSTEM)/dumpvar.mk
