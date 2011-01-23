@@ -9,8 +9,6 @@ Invoke ". build/envsetup.sh" from your shell to add the following functions to y
 - jgrep:   Greps on all local Java files.
 - resgrep: Greps on all local res/*.xml files.
 - godir:   Go to the directory containing a file.
-- mka:     Builds using SCHED_BATCH on all processors
-- reposync: Parallel repo sync using ionice and SCHED_BATCH
 
 Look at the source to view more functions. The complete list is:
 EOF
@@ -313,7 +311,7 @@ function chooseproduct()
         if [ "$TARGET_SIMULATOR" = true ] ; then
             default_value=sim
         else
-            default_value=full
+            default_value=generic
         fi
     fi
 
@@ -431,7 +429,7 @@ function add_lunch_combo()
 }
 
 # add the default one here
-add_lunch_combo full-eng
+add_lunch_combo generic-eng
 
 # if we're on linux, add the simulator.  There is a special case
 # in lunch to deal with the simulator
@@ -466,7 +464,7 @@ function lunch()
         answer=$1
     else
         print_lunch_menu
-        echo -n "Which would you like? [full-eng] "
+        echo -n "Which would you like? [generic-eng] "
         read answer
     fi
 
@@ -474,7 +472,7 @@ function lunch()
 
     if [ -z "$answer" ]
     then
-        selection=full-eng
+        selection=generic-eng
     elif [ "$answer" = "simulator" ]
     then
         selection=simulator
@@ -562,7 +560,7 @@ function tapas()
         apps=all
     fi
 
-    export TARGET_PRODUCT=full
+    export TARGET_PRODUCT=generic
     export TARGET_BUILD_VARIANT=$variant
     export TARGET_SIMULATOR=false
     export TARGET_BUILD_TYPE=release
@@ -1038,7 +1036,7 @@ function godir () {
         echo ""
     fi
     local lines
-    lines=($(grep "$1" $T/filelist | sed -e 's/\/[^/]*$//' | sort | uniq))
+    lines=($(grep "$1" $T/filelist | sed -e 's/\/[^/]*$//' | sort | uniq)) 
     if [[ ${#lines[@]} = 0 ]]; then
         echo "Not found"
         return
@@ -1051,7 +1049,7 @@ function godir () {
             local line
             for line in ${lines[@]}; do
                 printf "%6s %s\n" "[$index]" $line
-                index=$(($index + 1))
+                index=$(($index + 1)) 
             done
             echo
             echo -n "Select one: "
@@ -1068,37 +1066,6 @@ function godir () {
         pathname=${lines[0]}
     fi
     cd $T/$pathname
-}
-
-function cmremote()
-{
-    git remote rm cmremote 2> /dev/null
-    if [ ! -d .git ]
-    then
-        echo .git directory not found. Please run this from the root directory of the Android repository you wish to set up.
-    fi
-    GERRIT_REMOTE=$(cat .git/config  | grep git://github.com | awk '{ print $3 }' | sed s#git://github.com/##g)
-    if [ -z "$GERRIT_REMOTE" ]
-    then
-        echo Unable to set up the git remote, are you in the root of the repo?
-        return 0
-    fi
-    CMUSER=`git config --get review.review.cyanogenmod.com.username`
-    if [ -z "$CMUSER" ]
-    then
-        git remote add cmremote ssh://review.cyanogenmod.com:29418/$GERRIT_REMOTE
-    else
-        git remote add cmremote ssh://$CMUSER@review.cyanogenmod.com:29418/$GERRIT_REMOTE
-    fi
-    echo You can now push to "cmremote".
-}
-
-function mka() {
-    schedtool -B -n 1 -e ionice -n 1 make -j `cat /proc/cpuinfo | grep "^processor" | wc -l` "$@"
-}
-
-function reposync() {
-    schedtool -B -n 1 -e ionice -n 1 repo sync -j 10 "$@"
 }
 
 # Force JAVA_HOME to point to java 1.6 if it isn't already set

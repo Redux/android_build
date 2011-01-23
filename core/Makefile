@@ -27,16 +27,10 @@ $(foreach cf,$(PRODUCT_COPY_FILES), \
 
 define set-product-variable
 $(shell echo Define: $(1) $(2))
-ifneq ($(strip $(1),))
-$(1)
+ifneq($(strip($1),))
+$(1) := $(2)
 endif
 endef
-
-$(foreach cf,$(strip $(PRODUCT_SPECIFIC_DEFINES)), \
-  $(eval _define := $(call word-colon,1,$(cf))) \
-  $(eval _value := $(call word-colon,2,$(cf))) \
-  $(eval $(call set-product-variable,$(_define),$(_value))) \
-)
 
 # -----------------------------------------------------------------
 # docs/index.html
@@ -358,10 +352,6 @@ ifdef BOARD_KERNEL_PAGESIZE
   INTERNAL_BOOTIMAGE_ARGS += --pagesize $(BOARD_KERNEL_PAGESIZE)
 endif
 
-ifneq ($(BOARD_FORCE_RAMDISK_ADDRESS),)
-    INTERNAL_BOOTIMAGE_ARGS += --ramdiskaddr $(BOARD_FORCE_RAMDISK_ADDRESS)
-endif
-
 INSTALLED_BOOTIMAGE_TARGET := $(PRODUCT_OUT)/boot.img
 
 ifeq ($(TARGET_BOOTIMAGE_USE_EXT2),true)
@@ -603,18 +593,6 @@ INTERNAL_USERIMAGES_DEPS := $(MKYAFFS2)
 endif
 
 # -----------------------------------------------------------------
-# Utility executables
-
-INTERNAL_UTILITY_FILES := $(filter $(PRODUCT_OUT)/utilities/%, \
-	$(ALL_PREBUILT) \
-	$(ALL_COPIED_HEADERS) \
-	$(ALL_GENERATED_SOURCES) \
-	$(ALL_DEFAULT_INSTALLED_MODULES))
-
-.PHONY: utilities
-utilities: $(INTERNAL_UTILITY_FILES)
-
-# -----------------------------------------------------------------
 # Recovery image
 
 # If neither TARGET_NO_KERNEL nor TARGET_NO_RECOVERY are true
@@ -657,14 +635,6 @@ BOARD_KERNEL_PAGESIZE := $(strip $(BOARD_KERNEL_PAGESIZE))
 ifdef BOARD_KERNEL_PAGESIZE
   INTERNAL_RECOVERYIMAGE_ARGS += --pagesize $(BOARD_KERNEL_PAGESIZE)
 endif
-ifneq ($(BOARD_FORCE_RAMDISK_ADDRESS),)
-    INTERNAL_RECOVERYIMAGE_ARGS += --ramdiskaddr $(BOARD_FORCE_RAMDISK_ADDRESS)
-endif
-INTERNAL_RECOVERY_FILES := $(filter $(TARGET_RECOVERY_OUT)/%, \
-	$(ALL_PREBUILT) \
-	$(ALL_COPIED_HEADERS) \
-	$(ALL_GENERATED_SOURCES) \
-	$(ALL_DEFAULT_INSTALLED_MODULES))
 
 # Keys authorized to sign OTA packages this build will accept.  The
 # build always uses test-keys for this; release packaging tools will
@@ -684,7 +654,6 @@ $(RECOVERY_INSTALL_OTA_KEYS): $(OTA_PUBLIC_KEYS) $(DUMPKEY_JAR)
 	java -jar $(DUMPKEY_JAR) $(PRIVATE_OTA_PUBLIC_KEYS) > $@
 
 $(INSTALLED_RECOVERYIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP) \
-		$(INTERNAL_RECOVERY_FILES) \
 		$(INSTALLED_RAMDISK_TARGET) \
 		$(INSTALLED_BOOTIMAGE_TARGET) \
 		$(recovery_binary) \
@@ -694,6 +663,7 @@ $(INSTALLED_RECOVERYIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP) \
 		$(recovery_fstab) \
 		$(RECOVERY_INSTALL_OTA_KEYS)
 	@echo ----- Making recovery image ------
+	rm -rf $(TARGET_RECOVERY_OUT)
 	mkdir -p $(TARGET_RECOVERY_OUT)
 	mkdir -p $(TARGET_RECOVERY_ROOT_OUT)
 	mkdir -p $(TARGET_RECOVERY_ROOT_OUT)/etc
@@ -704,8 +674,6 @@ $(INSTALLED_RECOVERYIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP) \
 	echo Modifying ramdisk contents...
 	cp -f $(recovery_initrc) $(TARGET_RECOVERY_ROOT_OUT)/
 	cp -f $(recovery_binary) $(TARGET_RECOVERY_ROOT_OUT)/sbin/
-	rm -f $(TARGET_RECOVERY_ROOT_OUT)/init.*.rc
-	mkdir -p $(TARGET_RECOVERY_ROOT_OUT)/system/bin
 	cp -rf $(recovery_resources_common) $(TARGET_RECOVERY_ROOT_OUT)/
 	$(foreach item,$(recovery_resources_private), \
 	  cp -rf $(item) $(TARGET_RECOVERY_ROOT_OUT)/)
@@ -778,7 +746,7 @@ SYSTEMIMAGE_SOURCE_DIR := $(TARGET_OUT)
 # image size check calculation.
 ifneq ($(INSTALLED_RECOVERYIMAGE_TARGET),)
 intermediates := $(call intermediates-dir-for,PACKAGING,recovery_patch)
-RECOVERY_FROM_BOOT_PATCH := #$(intermediates)/recovery_from_boot.p
+RECOVERY_FROM_BOOT_PATCH := $(intermediates)/recovery_from_boot.p
 $(RECOVERY_FROM_BOOT_PATCH): $(INSTALLED_RECOVERYIMAGE_TARGET) \
                              $(INSTALLED_BOOTIMAGE_TARGET) \
 			     $(HOST_OUT_EXECUTABLES)/imgdiff \
@@ -897,7 +865,6 @@ endif
 OTATOOLS :=  $(HOST_OUT_EXECUTABLES)/minigzip \
 	  $(HOST_OUT_EXECUTABLES)/mkbootfs \
 	  $(HOST_OUT_EXECUTABLES)/mkbootimg \
-	  $(HOST_OUT_EXECUTABLES)/unpackbootimg \
 	  $(HOST_OUT_EXECUTABLES)/fs_config \
 	  $(HOST_OUT_EXECUTABLES)/mkyaffs2image \
 	  $(HOST_OUT_EXECUTABLES)/zipalign \
@@ -1075,23 +1042,20 @@ INTERNAL_OTA_PACKAGE_TARGET := $(PRODUCT_OUT)/$(name).zip
 
 $(INTERNAL_OTA_PACKAGE_TARGET): KEY_CERT_PAIR := $(DEFAULT_KEY_CERT_PAIR)
 
-ifdef CYANOGEN_WITH_GOOGLE
-$(INTERNAL_OTA_PACKAGE_TARGET): backuptool := false
-else
-$(INTERNAL_OTA_PACKAGE_TARGET): backuptool := true
-endif
-
 $(INTERNAL_OTA_PACKAGE_TARGET): $(BUILT_TARGET_FILES_PACKAGE) $(OTATOOLS)
 	@echo "Package OTA: $@"
 	$(hide) ./build/tools/releasetools/ota_from_target_files -v \
 	   -p $(HOST_OUT) \
            -k $(KEY_CERT_PAIR) \
-           --backup=$(backuptool) \
            $(BUILT_TARGET_FILES_PACKAGE) $@
 
-.PHONY: otapackage
+.PHONY: otapackage redux
 otapackage: $(INTERNAL_OTA_PACKAGE_TARGET)
-bacon: otapackage
+
+redux: otapackage
+	$(hide) \
+	  WANT_SQUASHFS=$(WANT_SQUASHFS) \
+		./vendor/redux/tools/squisher
 
 # -----------------------------------------------------------------
 # The update package
@@ -1099,15 +1063,6 @@ bacon: otapackage
 name := $(TARGET_PRODUCT)
 ifeq ($(TARGET_BUILD_TYPE),debug)
   name := $(name)_debug
-endif
-ifeq ($(TARGET_NO_RECOVERY),true)
-    TARGET_OTA_NO_RECOVERY := true
-endif
-ifeq ($(TARGET_OTA_NO_RECOVERY),)
-# default to "false"
-$(INTERNAL_OTA_PACKAGE_TARGET): recoveryex := false
-else
-$(INTERNAL_OTA_PACKAGE_TARGET): recoveryex := $(TARGET_OTA_NO_RECOVERY)
 endif
 name := $(name)-img-$(FILE_NAME_TAG)
 
@@ -1129,12 +1084,6 @@ $(INTERNAL_UPDATE_PACKAGE_TARGET): $(BUILT_TARGET_FILES_PACKAGE) $(OTATOOLS)
 
 .PHONY: updatepackage
 updatepackage: $(INTERNAL_UPDATE_PACKAGE_TARGET)
-.PHONY: otapackage redux
-otapackage: $(INTERNAL_OTA_PACKAGE_TARGET)
-redux: otapackage
-	$(hide) \
-		WANT_SQUASHFS=$(WANT_SQUASHFS) \
-		./vendor/redux/tools/squisher
 
 endif    # TARGET_NO_KERNEL != true
 endif    # TARGET_DEVICE != generic

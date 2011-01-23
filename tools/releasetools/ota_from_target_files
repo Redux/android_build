@@ -44,10 +44,6 @@ Usage:  ota_from_target_files [flags] input_target_files output_ota_package
   -e  (--extra_script)  <file>
       Insert the contents of file at the end of the update script.
 
-  --backup <boolean>
-      Enable or disable the execution of backuptool.sh.
-      Disabled by default.
-
 """
 
 import sys
@@ -79,7 +75,6 @@ OPTIONS.wipe_user_data = False
 OPTIONS.omit_prereq = False
 OPTIONS.extra_script = None
 OPTIONS.worker_threads = 3
-OPTIONS.backuptool = False
 
 def MostPopularKey(d, default):
   """Given a dict, return the key corresponding to the largest
@@ -257,12 +252,15 @@ def CopySystemFiles(input_zip, output_zip=None,
 
   symlinks = []
 
+  print "CopySystemFiles called"
+
   for info in input_zip.infolist():
     if info.filename.startswith("SYSTEM/"):
       basefilename = info.filename[7:]
       if IsSymlink(info):
         symlinks.append((input_zip.read(info.filename),
                          "/system/" + basefilename))
+
       else:
         info2 = copy.copy(info)
         fn = info2.filename = "system/" + basefilename
@@ -366,14 +364,12 @@ def WriteFullOTAPackage(input_zip, output_zip):
       metadata=metadata,
       info_dict=OPTIONS.info_dict)
 
-#  if not OPTIONS.omit_prereq:
-#    ts = GetBuildProp("ro.build.date.utc", input_zip)
-#    script.AssertOlderBuild(ts)
+  if not OPTIONS.omit_prereq:
+    ts = GetBuildProp("ro.build.date.utc", input_zip)
+    script.AssertOlderBuild(ts)
 
   AppendAssertions(script, input_zip)
   device_specific.FullOTA_Assertions()
-  if OPTIONS.backuptool:
-    script.RunBackup("backup")
 
   script.ShowProgress(0.5, 0)
 
@@ -400,10 +396,6 @@ def WriteFullOTAPackage(input_zip, output_zip):
   common.CheckSize(boot_img.data, "boot.img", OPTIONS.info_dict)
   common.ZipWriteStr(output_zip, "boot.img", boot_img.data)
   script.ShowProgress(0.2, 0)
-
-  if OPTIONS.backuptool:
-    script.ShowProgress(0.2, 10)
-    script.RunBackup("restore")
 
   script.ShowProgress(0.2, 10)
   script.WriteRawImage("/boot", "boot.img")
@@ -721,8 +713,6 @@ def main(argv):
       OPTIONS.extra_script = a
     elif o in ("--worker_threads"):
       OPTIONS.worker_threads = int(a)
-    elif o in ("--backup"):
-      OPTIONS.backuptool = bool(a.lower() == 'true')
     else:
       return False
     return True
@@ -735,8 +725,7 @@ def main(argv):
                                               "wipe_user_data",
                                               "no_prereq",
                                               "extra_script=",
-                                              "worker_threads=",
-                                              "backup="],
+                                              "worker_threads="],
                              extra_option_handler=option_handler)
 
   if len(args) != 2:

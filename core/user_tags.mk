@@ -133,9 +133,6 @@ GRANDFATHERED_USER_MODULES += \
 	gzip \
 	hciattach \
 	hierarchyviewer \
-	hierarchyviewer1 \
-	hierarchyviewer2 \
-	hierarchyviewerlib \
 	hist_trace \
 	hosttestlib \
 	icudata \
@@ -198,13 +195,12 @@ GRANDFATHERED_USER_MODULES += \
 	libcamerastub \
 	libc_common \
 	libc_nomalloc \
+	libclearsilverregex \
 	libctest \
 	libcutils \
-	libclearsilverregex \
 	libdb \
 	libdbus \
 	libdiskconfig \
-	libdiskconfig_host \
 	libdl \
 	libdrm1 \
 	libdrm1_jni \
@@ -384,7 +380,6 @@ GRANDFATHERED_USER_MODULES += \
 	mkyaffs2image \
 	monkey \
 	monkeyrunner \
-	MonkeyRunnerTest \
 	mtpd \
 	ndc \
 	netcfg \

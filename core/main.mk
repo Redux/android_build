@@ -77,7 +77,7 @@ $(warning ************************************************************)
 $(warning You are attempting to build on a 32-bit system.)
 $(warning Only 64-bit build environments are supported beyond froyo/2.2.)
 $(warning ************************************************************)
-BUILDING_ON_32BIT := true
+$(error stop)
 endif
 endif
 
@@ -147,8 +147,6 @@ endif
 
 $(shell echo 'VERSIONS_CHECKED := $(VERSION_CHECK_SEQUENCE_NUMBER)' \
         > $(OUT_DIR)/versions_checked.mk)
-$(shell echo 'BUILDING_ON_32BIT := $(BUILDING_ON_32BIT)' \
-        >> $(OUT_DIR)/versions_checked.mk)
 endif
 
 # These are the modifier targets that don't do anything themselves, but
@@ -209,7 +207,7 @@ user_variant := $(filter userdebug user,$(TARGET_BUILD_VARIANT))
 enable_target_debugging := true
 ifneq (,$(user_variant))
   # Target is secure in user builds.
-  ADDITIONAL_DEFAULT_PROPERTIES += ro.secure=0
+  ADDITIONAL_DEFAULT_PROPERTIES += ro.secure=1
 
   tags_to_install := user
   ifeq ($(user_variant),userdebug)
@@ -233,11 +231,11 @@ ifneq (,$(user_variant))
   endif
 
   # Disallow mock locations by default for user builds
-  ADDITIONAL_DEFAULT_PROPERTIES += ro.allow.mock.location=1
+  ADDITIONAL_DEFAULT_PROPERTIES += ro.allow.mock.location=0
 
 else # !user_variant
   # Turn on checkjni for non-user builds.
-  ADDITIONAL_BUILD_PROPERTIES += ro.kernel.android.checkjni=1
+  #ADDITIONAL_BUILD_PROPERTIES += ro.kernel.android.checkjni=1
   # Set device insecure for non-user builds.
   ADDITIONAL_DEFAULT_PROPERTIES += ro.secure=0
   # Allow mock locations by default for non user builds
@@ -771,20 +769,12 @@ $(call dist-for-goals,sdk, \
 findbugs: $(INTERNAL_FINDBUGS_HTML_TARGET) $(INTERNAL_FINDBUGS_XML_TARGET)
 
 .PHONY: clean
-dirs_to_clean := \
-	$(PRODUCT_OUT) \
-	$(TARGET_COMMON_OUT_ROOT)
 clean:
-	@for dir in $(dirs_to_clean) ; do \
-	    echo "Cleaning $$dir..."; \
-	    rm -rf $$dir; \
-	done
-	@echo "Clean."; \
-
-.PHONY: clobber
-clobber:
 	@rm -rf $(OUT_DIR)
 	@echo "Entire build directory removed."
+
+.PHONY: clobber
+clobber: clean
 
 # The rules for dataclean and installclean are defined in cleanbuild.mk.
 

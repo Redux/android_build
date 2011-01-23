@@ -16,40 +16,40 @@
 
 PRODUCT_PROPERTY_OVERRIDES :=
 
-#PRODUCT_PACKAGES := \
-#	SystemUI \
-#	AccountAndSyncSettings \
-#	Camera \
-#	Calculator \
-#	DeskClock \
-#	Development \
-#	DrmProvider \
-#	Email \
-#	Fallback \
-#	Gallery \
-#	GPSEnable \
-#	Launcher2 \
-#	Protips \
-#	Music \
-#	Mms \
-#	Settings \
-#	SdkSetup \
-#	CustomLocale \
-#	gpstest \
-#	sqlite3 \
-#	LatinIME \
-#	PinyinIME \
-#	OpenWnn \
-#	libWnnEngDic \
-#	libWnnJpnDic \
-#	libwnndict \
-#	CertInstaller \
-#	LiveWallpapersPicker \
-#	ApiDemos \
-#	GestureBuilder \
-#	SoftKeyboard \
-#	CubeLiveWallpapers \
-#	QuickSearchBox
+PRODUCT_PACKAGES := \
+	SystemUI \
+	AccountAndSyncSettings \
+	Camera \
+	Calculator \
+	DeskClock \
+	Development \
+	DrmProvider \
+	Email \
+	Fallback \
+	Gallery \
+	GPSEnable \
+	Launcher2 \
+	Protips \
+	Music \
+	Mms \
+	Settings \
+	SdkSetup \
+	CustomLocale \
+	gpstest \
+	sqlite3 \
+	LatinIME \
+	PinyinIME \
+	OpenWnn \
+	libWnnEngDic \
+	libWnnJpnDic \
+	libwnndict \
+	CertInstaller \
+	LiveWallpapersPicker \
+	ApiDemos \
+	GestureBuilder \
+	SoftKeyboard \
+	CubeLiveWallpapers \
+	QuickSearchBox
 
 # Host tools that are parts of the SDK.
 # See development/build/sdk.atree

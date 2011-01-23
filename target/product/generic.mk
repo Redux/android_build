@@ -31,7 +31,7 @@ PRODUCT_PACKAGES := \
     Gallery3D \
     LatinIME \
     Mms \
-    Provision \
+    Music \
     Protips \
     QuickSearchBox \
     Settings \
