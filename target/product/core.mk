@@ -42,6 +42,7 @@ PRODUCT_PACKAGES := \
     framework-res \
     hprof-conv \
     icu.dat \
+    ip-up-vpn \
     jasmin \
     jasmin.jar \
     libcrypto \
