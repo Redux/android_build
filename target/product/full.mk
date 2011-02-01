@@ -42,7 +42,7 @@ $(call inherit-product, frameworks/base/data/sounds/OriginalAudio.mk)
 
 # Get a list of languages. We use the small list to save space
 # on smaller devices.
-$(call inherit-product, build/target/product/languages_small.mk)
+$(call inherit-product, build/target/product/languages_full.mk)
 
 $(call inherit-product, build/target/product/generic.mk)
 
