@@ -243,15 +243,15 @@ else # !user_variant
   ADDITIONAL_DEFAULT_PROPERTIES += ro.allow.mock.location=1
 endif # !user_variant
 
-ifeq (true,$(strip $(enable_target_debugging)))
+#ifeq (true,$(strip $(enable_target_debugging)))
   # Target is more debuggable and adbd is on by default
-  ADDITIONAL_DEFAULT_PROPERTIES += ro.debuggable=1 persist.service.adb.enable=1
+#  ADDITIONAL_DEFAULT_PROPERTIES += ro.debuggable=1 persist.service.adb.enable=1
   # Include the debugging/testing OTA keys in this build.
-  INCLUDE_TEST_OTA_KEYS := true
-else # !enable_target_debugging
+#  INCLUDE_TEST_OTA_KEYS := true
+#else # !enable_target_debugging
   # Target is less debuggable and adbd is off by default
-  ADDITIONAL_DEFAULT_PROPERTIES += ro.debuggable=0 persist.service.adb.enable=0
-endif # !enable_target_debugging
+#  ADDITIONAL_DEFAULT_PROPERTIES += ro.debuggable=0 persist.service.adb.enable=0
+#endif # !enable_target_debugging
 
 ## eng ##
 
