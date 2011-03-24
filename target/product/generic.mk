@@ -29,7 +29,6 @@ PRODUCT_PACKAGES := \
     DrmProvider \
     Email \
     Gallery3D \
-    Launcher2 \
     LatinIME \
     Mms \
     Music \
@@ -42,6 +41,11 @@ PRODUCT_PACKAGES := \
     Updater \
     CalendarProvider \
     SyncProvider
+
+ifndef THEMED
+   PRODUCT_PACKAGES += \
+	    Launcher2
+endif
 
 $(call inherit-product, $(SRC_TARGET_DIR)/product/core.mk)
 
